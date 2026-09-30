@@ -1,0 +1,6 @@
+{
+  // Flutter builds android/ itself; stop the Java/Gradle extensions
+  // from importing it as a standalone project (causes a false "Gradle: Build Error").
+  "java.import.gradle.enabled": false,
+  "gradle.autoDetect": "off"
+}

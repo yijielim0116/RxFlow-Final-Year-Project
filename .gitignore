@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Editors (project-specific VS Code settings in .vscode/ are committed on purpose)
+.idea/
+*.iml
+
+# Environment / secrets
+.env
+.env.*
