@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yijielim0116/RxFlow-Final-Year-Project/protocols/protocol.schema.json",
+  "title": "CCS consultation protocol",
+  "description": "Defines one HSE Common Conditions Service condition as data for the protocol engine (FR25). Sections shared by every condition (personal details, standard medical history, declaration statements, pharmacist information) are built into the engine; a protocol only describes what varies.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "name", "version", "source", "patient", "redFlags", "symptoms", "treatment", "declaration", "medicines"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1, "description": "Version of this schema the protocol is written against." },
+    "id": { "$ref": "#/$defs/id" },
+    "name": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Protocol version (semantic versioning). Consultations keep the version they used (FR26)."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document", "edition"],
+      "properties": {
+        "document": { "type": "string", "minLength": 1 },
+        "edition": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+    "patient": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowsUnder16"],
+      "properties": {
+        "allowsUnder16": {
+          "type": "boolean",
+          "description": "Whether patients under 16 can be seen. If true, parent/guardian details and consent are required for under-16s."
+        }
+      }
+    },
+    "questions": {
+      "type": "array",
+      "description": "Condition-specific questions added to the medical history section.",
+      "items": { "$ref": "#/$defs/question" }
+    },
+    "redFlags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tiers"],
+      "properties": {
+        "tiers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/tier" } }
+      }
+    },
+    "symptoms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groups", "typicalQuestion"],
+      "properties": {
+        "groups": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/symptomGroup" } },
+        "typicalQuestion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "options"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1 },
+            "options": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "label", "typical"],
+                "properties": {
+                  "id": { "$ref": "#/$defs/id" },
+                  "label": { "type": "string", "minLength": 1 },
+                  "typical": { "type": "boolean", "description": "false means the symptoms are not typical and a referral reason is required." }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "treatment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pathways"],
+      "properties": {
+        "pathways": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Inclusion criteria and the actions they allow. The first pathway whose condition is met applies.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "when", "actions"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "label": { "type": "string", "minLength": 1 },
+              "when": { "$ref": "#/$defs/condition" },
+              "actions": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "enum": ["PRESCRIBE", "ADVICE", "WAIT_AND_SEE"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["followUp"],
+      "properties": {
+        "followUp": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Condition-specific wording completing: 'I have been given information on the steps to take …'"
+        }
+      }
+    },
+    "medicines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groups"],
+      "properties": {
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "groups": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/medicineGroup" } }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Lower-case kebab-case identifier, unique within its list."
+    },
+    "fieldRef": {
+      "type": "string",
+      "pattern": "^(patient\\.(ageMonths|ageYears|sex)|history\\.(pregnant|breastfeeding|renalImpairment|hepaticImpairment|antimicrobialResistance)|(questions|criteria|symptoms)\\.[a-z0-9]+(-[a-z0-9]+)*|symptoms\\.typical)$",
+      "description": "A value the engine can evaluate: patient.ageMonths, patient.ageYears, patient.sex (MALE or FEMALE), standard history answers, a condition-specific question, a ticked red-flag criterion, a ticked symptom, or symptoms.typical (the selected option id)."
+    },
+    "scalar": { "type": ["string", "number", "boolean"] },
+    "condition": {
+      "description": "A side-effect-free expression evaluated by the protocol engine.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["all"],
+          "properties": { "all": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/condition" } } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any"],
+          "properties": { "any": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/condition" } } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["not"],
+          "properties": { "not": { "$ref": "#/$defs/condition" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["field"],
+          "minProperties": 2,
+          "maxProperties": 2,
+          "properties": {
+            "field": { "$ref": "#/$defs/fieldRef" },
+            "eq": { "$ref": "#/$defs/scalar" },
+            "ne": { "$ref": "#/$defs/scalar" },
+            "lt": { "type": "number" },
+            "lte": { "type": "number" },
+            "gt": { "type": "number" },
+            "gte": { "type": "number" },
+            "in": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/scalar" } }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count"],
+          "minProperties": 2,
+          "description": "Counts how many of the listed fields are true, then compares the count.",
+          "properties": {
+            "count": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/fieldRef" } },
+            "eq": { "type": "integer", "minimum": 0 },
+            "gte": { "type": "integer", "minimum": 0 },
+            "lte": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "type"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["BOOLEAN", "TEXT"] },
+        "required": { "type": "boolean", "default": true }
+      }
+    },
+    "tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "label", "allowsLimitedSupply", "referTo", "criteria"],
+      "properties": {
+        "tier": {
+          "enum": ["EMERGENCY", "URGENT", "REFER", "REFER_LIMITED_SUPPLY"],
+          "description": "Defined by the action required, not by the form's section number. Severity: EMERGENCY > URGENT > REFER > REFER_LIMITED_SUPPLY."
+        },
+        "label": { "type": "string", "minLength": 1 },
+        "allowsLimitedSupply": { "type": "boolean", "description": "Whether an initial limited supply may be prescribed while referring." },
+        "referTo": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["AE", "GP", "GP_OUT_OF_HOURS", "DENTAL", "OTHER"] }
+        },
+        "criteria": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/criterion" } }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "trigger": {
+          "$ref": "#/$defs/condition",
+          "description": "When met, the engine ticks this criterion automatically (e.g. age or pregnancy)."
+        },
+        "pharmacistDiscretion": {
+          "type": "boolean",
+          "description": "The pharmacist may decide whether this criterion prevents treatment."
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "symptomGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "items"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "showWhen": { "$ref": "#/$defs/condition" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "label": { "type": "string", "minLength": 1 },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "medicineGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "role", "options"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "role": { "enum": ["PRIMARY", "ADJUNCT"], "description": "ADJUNCT medicines may only be added alongside a PRIMARY medicine." },
+        "line": { "type": "integer", "minimum": 1, "description": "Line of therapy (1 = first line)." },
+        "availableWhen": { "$ref": "#/$defs/condition" },
+        "note": { "type": "string" },
+        "options": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/medicine" } }
+      }
+    },
+    "medicine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "dosage"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "dosage": { "type": "string", "minLength": 1 },
+        "availableWhen": { "$ref": "#/$defs/condition" },
+        "note": { "type": "string" },
+        "extensions": {
+          "type": "array",
+          "description": "Optional changes to the course, e.g. extended duration if immunocompromised.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "dosage"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "label": { "type": "string", "minLength": 1 },
+              "dosage": { "type": "string", "minLength": 1 },
+              "applyWhen": { "$ref": "#/$defs/condition" }
+            }
+          }
+        },
+        "quantities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "label": { "type": "string", "minLength": 1 },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

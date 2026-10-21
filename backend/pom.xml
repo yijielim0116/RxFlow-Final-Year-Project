@@ -71,6 +71,13 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>
+        <!-- Validates protocol definitions against protocols/protocol.schema.json (FR25, NFR13).
+             1.5.x uses Jackson 2, matching Quarkus; 2.x+ moved to Jackson 3. -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.6</version>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit</artifactId>

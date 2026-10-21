@@ -1,0 +1,150 @@
+{
+  "$schema": "../protocol.schema.json",
+  "schemaVersion": 1,
+  "id": "cold-sores",
+  "name": "Cold Sores",
+  "version": "1.0.0",
+  "source": {
+    "document": "IPU Pharmacist Assessment Form – Cold Sores",
+    "edition": "Version 1, January 2026",
+    "notes": "Criteria are summarised for the prototype. The HSE CCS protocol remains the clinical reference."
+  },
+  "patient": {
+    "allowsUnder16": true
+  },
+  "questions": [],
+  "redFlags": {
+    "tiers": [
+      {
+        "tier": "EMERGENCY",
+        "label": "Emergency referral to a hospital emergency department or emergency services",
+        "allowsLimitedSupply": false,
+        "referTo": ["AE"],
+        "criteria": [
+          {
+            "id": "systemically-unwell",
+            "label": "Systemically very unwell, or showing symptoms of severe or life-threatening infection or sepsis",
+            "note": "Refer urgently to the emergency department by ambulance."
+          }
+        ]
+      },
+      {
+        "tier": "URGENT",
+        "label": "Urgent medical assessment (treating service, GP, GP out of hours or emergency department)",
+        "allowsLimitedSupply": false,
+        "referTo": ["GP", "GP_OUT_OF_HOURS", "AE"],
+        "criteria": [
+          {
+            "id": "under-1-month",
+            "label": "Under 1 month of age (corrected age for infants born pre-term)",
+            "trigger": { "field": "patient.ageMonths", "lt": 1 }
+          },
+          { "id": "eye-involvement", "label": "Lesions involving the eye" },
+          { "id": "severe-immunocompromise", "label": "Moderate to severe immunocompromise due to underlying medical conditions or treatments" }
+        ]
+      },
+      {
+        "tier": "REFER",
+        "label": "Referral to a GP or other relevant practitioner – pharmacist prescribing not permitted",
+        "allowsLimitedSupply": false,
+        "referTo": ["GP", "DENTAL", "OTHER"],
+        "criteria": [
+          { "id": "contraindications", "label": "Contraindications as specified in the medicine's Summary of Product Characteristics" },
+          {
+            "id": "pregnancy",
+            "label": "Pregnancy or suspected pregnancy (refer to GP or treating obstetrician/gynaecologist)",
+            "trigger": { "field": "history.pregnant", "eq": true }
+          },
+          { "id": "infection-spreading", "label": "Signs of the infection spreading" },
+          { "id": "not-improving-14-days", "label": "Symptoms not improving within 14 days, with or without treatment" },
+          { "id": "secondary-infection", "label": "Signs of secondary infection, e.g. very painful or very swollen" },
+          {
+            "id": "gingivostomatitis",
+            "label": "Suspected gingivostomatitis",
+            "note": "May be referred to a dental practitioner."
+          },
+          { "id": "erythema-multiforme", "label": "Suspected erythema multiforme" },
+          { "id": "hypersensitivity", "label": "Known hypersensitivity or adverse reaction to the treatment options or any of their components" }
+        ]
+      },
+      {
+        "tier": "REFER_LIMITED_SUPPLY",
+        "label": "Referral to a GP or other relevant practitioner – initial limited supply permitted",
+        "allowsLimitedSupply": true,
+        "referTo": ["GP", "OTHER"],
+        "criteria": [
+          { "id": "immunocompromised", "label": "Immunocompromised due to underlying medical conditions or treatments (excluding moderate to severe immunocompromise)" },
+          { "id": "recurrent-lesions", "label": "Recurrent problematic lesions or frequently recurring infection" }
+        ]
+      }
+    ]
+  },
+  "symptoms": {
+    "groups": [
+      {
+        "id": "typical",
+        "label": "Signs and symptoms typical of cold sores",
+        "items": [
+          { "id": "prodromal-phase", "label": "Prodromal phase – tingling, itching or burning feeling on the lip" },
+          { "id": "fluid-filled-blisters", "label": "Fluid-filled blisters that may weep and crust over into a scab" },
+          { "id": "swollen-glands", "label": "Swollen and tender glands" },
+          {
+            "id": "mouth-clusters",
+            "label": "Clusters of blisters or sores inside the mouth",
+            "note": "This may be gingivostomatitis – refer."
+          }
+        ]
+      },
+      {
+        "id": "children",
+        "label": "Other symptoms that may occur in children",
+        "showWhen": { "field": "patient.ageYears", "lt": 16 },
+        "items": [
+          { "id": "sore-gums", "label": "Sore gums" },
+          { "id": "sore-throat-glands", "label": "Sore throat and swollen glands" },
+          { "id": "more-saliva", "label": "More saliva than normal" },
+          { "id": "high-temperature", "label": "High temperature" },
+          { "id": "headaches", "label": "Headaches" },
+          { "id": "refusing-fluids", "label": "Refusing to drink fluids" }
+        ]
+      }
+    ],
+    "typicalQuestion": {
+      "label": "Are symptoms typical of cold sores?",
+      "options": [
+        { "id": "yes", "label": "Yes", "typical": true },
+        { "id": "no", "label": "No – refer and document", "typical": false }
+      ]
+    }
+  },
+  "treatment": {
+    "pathways": [
+      {
+        "id": "pharmacist-prescribing",
+        "label": "Meets the inclusion criteria – proceed with pharmacist prescribing and give advice and counselling",
+        "when": { "field": "symptoms.typical", "eq": "yes" },
+        "actions": ["PRESCRIBE", "ADVICE"]
+      }
+    ]
+  },
+  "declaration": {
+    "followUp": "if my symptoms get worse or persist for longer than 14 days, with or without treatment"
+  },
+  "medicines": {
+    "notes": ["See the HSE protocol and the Summary of Product Characteristics for dosage and notes for each medicine."],
+    "groups": [
+      {
+        "id": "topical-antiviral",
+        "label": "Topical antiviral",
+        "role": "PRIMARY",
+        "options": [
+          {
+            "id": "aciclovir-5-cream",
+            "name": "Aciclovir 5% w/w cream",
+            "dosage": "Apply five times daily at approximately four-hourly intervals, omitting the night-time application, for at least 4 days. If healing has not occurred, continue for up to 10 days."
+          }
+        ]
+      }
+    ]
+  }
+}

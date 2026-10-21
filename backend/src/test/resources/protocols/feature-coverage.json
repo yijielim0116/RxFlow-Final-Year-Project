@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "id": "feature-coverage",
+  "name": "Schema feature coverage (test fixture)",
+  "version": "0.1.0",
+  "source": {
+    "document": "Combines the most complex rules found across the seven CCS assessment forms",
+    "edition": "Test fixture – not a real protocol"
+  },
+  "patient": { "allowsUnder16": false },
+  "questions": [
+    { "id": "had-chickenpox-or-vaccine", "label": "Has the patient had chickenpox, or the chickenpox or shingles vaccine?", "type": "BOOLEAN" },
+    { "id": "prophylactic-antibiotics", "label": "Already taking prophylactic antibiotics for UTI?", "type": "BOOLEAN" }
+  ],
+  "redFlags": {
+    "tiers": [
+      {
+        "tier": "URGENT",
+        "label": "Urgent medical assessment – initial limited supply may be given (as in Shingles)",
+        "allowsLimitedSupply": true,
+        "referTo": ["GP", "GP_OUT_OF_HOURS", "AE"],
+        "criteria": [
+          {
+            "id": "pregnancy-urgent",
+            "label": "Pregnancy or suspected pregnancy (as in UTI)",
+            "trigger": { "field": "history.pregnant", "eq": true }
+          },
+          { "id": "severe-immunocompromise", "label": "Moderate to severe immunocompromise (as in Shingles)" }
+        ]
+      },
+      {
+        "tier": "REFER",
+        "label": "Referral – prescribing not permitted",
+        "allowsLimitedSupply": false,
+        "referTo": ["GP", "OTHER"],
+        "criteria": [
+          {
+            "id": "outside-age-range",
+            "label": "Under 16 or over 64 years (as in UTI)",
+            "trigger": { "any": [{ "field": "patient.ageYears", "lt": 16 }, { "field": "patient.ageYears", "gt": 64 }] }
+          },
+          { "id": "male", "label": "Males (as in UTI and vulvovaginal thrush)", "trigger": { "field": "patient.sex", "eq": "MALE" } },
+          {
+            "id": "on-prophylactic-antibiotics",
+            "label": "Already taking prophylactic antibiotics for UTI",
+            "trigger": { "field": "questions.prophylactic-antibiotics", "eq": true }
+          },
+          {
+            "id": "recurrent-candidiasis",
+            "label": "Recurrent vulvovaginal candidiasis",
+            "pharmacistDiscretion": true
+          }
+        ]
+      }
+    ]
+  },
+  "symptoms": {
+    "groups": [
+      {
+        "id": "urinary",
+        "label": "Typical urinary symptoms",
+        "items": [
+          { "id": "dysuria", "label": "Dysuria" },
+          { "id": "frequency", "label": "Frequency" },
+          { "id": "urgency", "label": "Urgency" }
+        ]
+      },
+      {
+        "id": "babies",
+        "label": "Signs in babies",
+        "showWhen": { "field": "patient.ageMonths", "lt": 24 },
+        "items": [{ "id": "white-coating-tongue", "label": "White coating on the tongue" }]
+      }
+    ],
+    "typicalQuestion": {
+      "label": "Are symptoms typical? (as in allergic rhinitis and conjunctivitis)",
+      "options": [
+        { "id": "rhinitis", "label": "Yes – allergic rhinitis", "typical": true },
+        { "id": "conjunctivitis", "label": "Yes – allergic conjunctivitis", "typical": true },
+        { "id": "no", "label": "No – refer and document", "typical": false }
+      ]
+    }
+  },
+  "treatment": {
+    "pathways": [
+      {
+        "id": "prescribe",
+        "label": "All three symptoms present and no exclusions (as in UTI)",
+        "when": {
+          "all": [
+            { "count": ["symptoms.dysuria", "symptoms.frequency", "symptoms.urgency"], "eq": 3 },
+            { "not": { "field": "symptoms.typical", "eq": "no" } }
+          ]
+        },
+        "actions": ["PRESCRIBE", "ADVICE"]
+      },
+      {
+        "id": "wait-and-see",
+        "label": "One or two symptoms – wait and see for 48 hours (as in UTI)",
+        "when": { "count": ["symptoms.dysuria", "symptoms.frequency", "symptoms.urgency"], "gte": 1 },
+        "actions": ["WAIT_AND_SEE", "ADVICE"]
+      }
+    ]
+  },
+  "declaration": { "followUp": "if my condition gets worse or does not improve within 48 hours after beginning treatment" },
+  "medicines": {
+    "notes": ["Be aware of dose reduction in renal impairment for all options (as in Shingles)."],
+    "groups": [
+      {
+        "id": "first-line",
+        "label": "First-line oral antiviral (as in Shingles)",
+        "role": "PRIMARY",
+        "line": 1,
+        "options": [
+          {
+            "id": "first-line-medicine",
+            "name": "Example first-line medicine",
+            "dosage": "Every eight hours for seven days",
+            "extensions": [
+              {
+                "id": "immunocompromised",
+                "label": "If immunocompromised",
+                "dosage": "Continue for 2 days after crusting of lesions",
+                "applyWhen": { "field": "criteria.severe-immunocompromise", "eq": true }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "eye-drops",
+        "label": "Eye drops – only for allergic conjunctivitis (as in allergic rhinitis and conjunctivitis)",
+        "role": "PRIMARY",
+        "availableWhen": { "field": "symptoms.typical", "eq": "conjunctivitis" },
+        "options": [{ "id": "example-eye-drops", "name": "Example eye drops", "dosage": "As per protocol" }]
+      },
+      {
+        "id": "topical-antibiotic",
+        "label": "Topical antibiotic with quantity choice (as in impetigo)",
+        "role": "PRIMARY",
+        "options": [
+          {
+            "id": "example-cream",
+            "name": "Example cream",
+            "dosage": "Every eight hours for five to seven days",
+            "availableWhen": { "not": { "field": "history.breastfeeding", "eq": true } },
+            "quantities": [
+              { "id": "15g", "label": "15 g tube" },
+              { "id": "30g", "label": "30 g tube", "note": "Only if the 15 g tube is unavailable" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "adjunct-cream",
+        "label": "Adjunct cream (as in vulvovaginal thrush)",
+        "role": "ADJUNCT",
+        "options": [{ "id": "example-adjunct", "name": "Example adjunct cream", "dosage": "Every 8–12 hours for up to 7 days" }]
+      }
+    ]
+  }
+}
