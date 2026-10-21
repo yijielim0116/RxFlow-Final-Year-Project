@@ -1,5 +1,7 @@
 # RxFlow – Final Year Project
 
+[![CI](https://github.com/yijielim0116/RxFlow-Final-Year-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/yijielim0116/RxFlow-Final-Year-Project/actions/workflows/ci.yml)
+
 **A scalable, data-driven mobile system for structured community pharmacy consultations.**
 
 RxFlow guides Irish community pharmacists through structured consultations under the **HSE Common Conditions Service (CCS)**, from patient details and medical history through red-flag screening, treatment and outcome, and produces a secure, auditable record of every consultation.
