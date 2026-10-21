@@ -58,8 +58,9 @@ RxFlow started as a web prototype built in SETU's Startup Lab. That prototype pr
 ```
 .
 ├── mobile/        Flutter app (Android + iOS, phone + tablet)
-├── backend/       Quarkus REST API (coming in Sprint 1)
-└── docs/          Diagrams and project documentation
+├── backend/       Quarkus REST API (Java 21)
+├── docs/          Diagrams and project documentation
+└── compose.yaml   Local development services (PostgreSQL) for Podman Compose
 ```
 
 ## Getting started
@@ -76,7 +77,15 @@ flutter run
 
 ### Backend
 
-Instructions will be added once the Quarkus backend is set up.
+Requirements: Java 21, [Podman](https://podman.io/) and podman-compose.
+
+```bash
+podman compose up -d      # start PostgreSQL
+cd backend
+./mvnw quarkus:dev        # start the API with live reload
+```
+
+The API runs at http://localhost:8080 (health at `/q/health`, API docs at `/q/swagger-ui`). See [backend/README.md](backend/README.md) for tests and configuration.
 
 ## Project management
 

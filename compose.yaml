@@ -1,0 +1,22 @@
+# Local development services. Start with:  podman compose up -d
+# Uses synthetic data only; credentials are for local development, never production.
+services:
+  postgres:
+    image: docker.io/library/postgres:18
+    container_name: rxflow-postgres
+    environment:
+      POSTGRES_DB: rxflow
+      POSTGRES_USER: rxflow
+      POSTGRES_PASSWORD: rxflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - rxflow-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rxflow -d rxflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  rxflow-pgdata:
