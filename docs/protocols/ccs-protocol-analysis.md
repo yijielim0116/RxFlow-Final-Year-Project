@@ -36,11 +36,11 @@ Section 4 groups criteria into up to four tiers. **The section numbers are not c
 | Condition | Refer by age | Refer by sex | Pregnancy | Guardian | Tiers | Extra history | Medicines (8.2) | Follow-up wording |
 |---|---|---|---|---|---|---|---|---|
 | **Cold sores** | < 1 month (corrected) | — | Refer GP | Yes | E, U, R, RLS | — | Aciclovir 5% cream | Worse or > 14 days |
-| **Allergic rhinitis & conjunctivitis** | < 2 years | — | Refer GP | Yes | E, R, RLS (no urgent tier) | Resistance to previous treatment | Nasal sprays: INCS (2nd gen), INCS + intranasal antihistamine, INCS (1st gen, **over 18 only**), intranasal antihistamine; *rest unreadable — see gaps* | Worse or does not improve |
+| **Allergic rhinitis & conjunctivitis** | < 2 years | — | Refer GP | Yes | E, R, RLS (no urgent tier) | Resistance to previous treatment | **Rhinitis:** nasal sprays (INCS 2nd gen; INCS + intranasal antihistamine; INCS 1st gen **over 18 only**; intranasal antihistamine) and minimally sedating oral antihistamines (2nd gen: cetirizine, loratadine, bilastine; 3rd gen: desloratadine, fexofenadine, levocetirizine; tablets and oral solutions). **Conjunctivitis** (eye only, or not responding to oral antihistamine): sodium cromoglicate, ketotifen or olopatadine eye drops | Worse or does not improve |
 | **Impetigo** (non-bullous) | < 2 months (corrected) | — | Recorded; **breastfeeding with lesion on breast → refer** | Yes | E, U, R, RLS | — | Fusidic acid 2% cream **or** sodium fusidate 2% ointment, 5–7 days; **quantity 15 g (30 g only if 15 g unavailable)** | Worse or no improvement within 72 hours |
 | **Oral thrush** | < 1 month (corrected) | — | Refer GP | Yes | E, U, R, RLS (referral may be to **dental practitioner**) | — | Nystatin suspension or miconazole oral gel, **dose by age band**; miconazole 2% cream for **breastfeeding mothers** (nipple/areola) | Worse or > 14 days |
 | **Shingles** | < 18 years | — | **Pregnancy or breastfeeding → refer** | No | E (many), U (**limited supply allowed**), R, RLS | Chickenpox history / chickenpox or shingles vaccine | **1st line** valaciclovir, **2nd** aciclovir, **3rd** famciclovir; each with an **"if immunocompromised"** extension; renal dose-reduction note | Worse or fails to respond |
-| **Uncomplicated lower UTI** | < 16 **or** > 64 years | **Male → refer** | **Urgent medical assessment** | No | E (several), U, R (no limited-supply tier) | Already on prophylactic antibiotics for UTI → refer | *Unreadable in scan — see gaps* | *Unreadable* |
+| **Uncomplicated lower UTI** | < 16 **or** > 64 years | **Male → refer** | **Urgent medical assessment** | No | E (several), U, R (no limited-supply tier) | Already on prophylactic antibiotics for UTI → refer | **First choice:** nitrofurantoin immediate release 50 mg 6-hourly or prolonged release 100 mg 12-hourly, 3 days. **Alternative first choice** if nitrofurantoin unsuitable (e.g. breastfeeding with infant < 1 month or G6PD deficiency, allergy, eGFR < 45): trimethoprim 200 mg 12-hourly, 3 days | Worse or no improvement within 48 hours |
 | **Vulvovaginal thrush** | < 16 **or** > 60 years | **Male → refer** | Refer GP | No | E, U, R (no limited-supply tier); recurrent candidiasis at **pharmacist discretion** | — | Clotrimazole pessary 500 mg / 200 mg / 100 mg or econazole 150 mg pessary; **optional adjunct** clotrimazole cream or clotrimazole + hydrocortisone cream | Worse or no improvement within 7 days, or recurs within 2 months |
 
 E = emergency, U = urgent, R = refer (no prescribing), RLS = refer with initial limited supply.
@@ -55,7 +55,7 @@ These rules apply to every condition and will be implemented once in the protoco
 4. **Highest tier sets the referral.** If several criteria are ticked, the most severe tier decides the suggested referral destination: `EMERGENCY` (A&E) > `URGENT` (GP / out of hours / ED) > `REFER` (GP, dental practitioner or other) > `REFER_LIMITED_SUPPLY` (GP, with an initial limited supply allowed).
 5. **Symptoms not typical → refer, but continue.** Answering "no" in section 5 requires a referral reason; the consultation then continues to section 6. *(As in the prototype.)*
 6. **Outcome.** In section 8 the pharmacist selects **one or more** outcomes (referral, self-care, OTC product, POM prescription, patient declined). Referral requires a destination (8.1); a POM prescription requires a medicine (8.2). Where a red flag is present, **referral must be one of the outcomes**, and a prescription is only allowed if every ticked criterion permits an initial limited supply.
-7. **Inclusion before prescribing.** Medicines in 8.2 can only be selected if the section 6 inclusion criteria are met (UTI: all listed symptoms present **and** all exclusions absent), except for an initial limited supply under rule 6.
+7. **Inclusion before prescribing.** Medicines in 8.2 can only be selected if the section 6 inclusion criteria are met (UTI: **all three** of dysuria, frequency and urgency **and** all exclusions absent; with only **one or two** of those symptoms the pathway is **"wait and see" for 48 hours** with advice and signposting, and no prescription), except for an initial limited supply under rule 6.
 8. **Medicine filtering.** Only medicines valid for the patient are offered: age bands (e.g. oral thrush), population (e.g. breastfeeding mothers, over 18 only), and modifiers (e.g. immunocompromised extension for shingles).
 9. **Guardian consent.** A parent/guardian name and signature are required when the patient is under 16 and the condition allows under-16s.
 
@@ -70,13 +70,14 @@ These rules apply to every condition and will be implemented once in the protoco
 | Red-flag criteria grouped by tier, with a per-tier limited-supply flag | Shingles urgent tier allows limited supply |
 | Criteria needing pharmacist judgement | VVT recurrent candidiasis ("pharmacist discretion") |
 | Grouped symptom checklists and multi-choice "typical?" answers | Allergic rhinitis vs allergic conjunctivitis |
-| All-of / any-of inclusion logic | UTI inclusion criteria |
+| All-of / count-based inclusion logic with alternative pathways | UTI: all 3 symptoms → prescribe; 1–2 symptoms → wait and see 48 hours |
+| Medicine groups that depend on earlier answers | Allergic rhinitis vs allergic conjunctivitis medicines |
+| Medicine suitability conditions and alternatives | UTI: trimethoprim if nitrofurantoin unsuitable (breastfeeding, allergy, eGFR < 45) |
 | Medicines with lines of therapy, age bands, population, modifiers, quantities and adjuncts | Shingles lines; oral thrush age bands; impetigo quantity; VVT adjunct creams |
 | Condition-specific declaration wording | 14 days / 72 hours / 7 days and 2 months |
 | Version and source metadata | "Version 1, January 2026" (FR26: consultations keep the version used) |
 
 ## 6. Gaps to resolve
 
-- **Allergic rhinitis, page 4** is unreadable in the scan (likely the remaining medicines, e.g. eye drops / oral antihistamines, and section 9).
-- **Uncomplicated lower UTI, page 3** is unreadable in the scan (medicines and declaration follow-up wording).
 - Doses and quantities must be checked against the official HSE protocols before being entered as protocol data.
+- Allergic rhinitis page 4 and UTI page 3 were rescanned on 21 October 2026 and are now included above.
